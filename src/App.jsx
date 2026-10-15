@@ -1,101 +1,126 @@
-import { useState } from "react";
-import heroImg from "./assets/hero.png";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "./assets/vite.svg";
-import "./App.css";
-
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+    <main className="min-h-screen bg-porcelain text-ink">
+      <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-12 lg:py-20">
+        <div className="mb-16 max-w-4xl">
+          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.24em] text-coral">
+            VOQYRA / Design System
           </p>
+
+          <h1 className="font-display text-5xl font-semibold leading-[0.95] tracking-[-0.05em] sm:text-6xl lg:text-8xl">
+            Fashion,
+            <br />
+            without the ordinary.
+          </h1>
+
+          <p className="mt-7 max-w-2xl text-base leading-7 text-slate sm:text-lg">
+            A bold editorial commerce experience built around strong typography, expressive color,
+            generous space, and purposeful interaction.
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button
+              type="button"
+              className="rounded-md bg-coral px-6 py-3.5 font-semibold text-ink transition-transform duration-300 ease-brand hover:-translate-y-0.5"
+            >
+              Shop the drop
+            </button>
+
+            <button
+              type="button"
+              className="rounded-md border border-ink bg-transparent px-6 py-3.5 font-semibold text-ink transition-colors duration-300 ease-brand hover:bg-ink hover:text-white"
+            >
+              Explore collection
+            </button>
+          </div>
         </div>
-        <button type="button" className="counter" onClick={() => setCount((count) => count + 1)}>
-          Count is {count}
-        </button>
+
+        <section aria-labelledby="color-system" className="mb-16">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate">
+                Foundation
+              </p>
+              <h2 id="color-system" className="mt-2 text-2xl font-semibold tracking-tight">
+                Color system
+              </h2>
+            </div>
+
+            <span className="hidden text-sm text-slate sm:block">Neo Editorial Commerce</span>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <article className="overflow-hidden rounded-lg bg-ink shadow-soft">
+              <div className="h-44"></div>
+              <div className="bg-soft-white p-5">
+                <p className="font-semibold">Deep Ink</p>
+                <p className="mt-1 text-sm text-slate">#11131A</p>
+              </div>
+            </article>
+
+            <article className="overflow-hidden rounded-lg border border-cloud bg-porcelain shadow-soft">
+              <div className="h-44"></div>
+              <div className="border-t border-cloud bg-soft-white p-5">
+                <p className="font-semibold">Warm Porcelain</p>
+                <p className="mt-1 text-sm text-slate">#F7F3ED</p>
+              </div>
+            </article>
+
+            <article className="overflow-hidden rounded-lg bg-coral shadow-soft">
+              <div className="h-44"></div>
+              <div className="bg-soft-white p-5">
+                <p className="font-semibold">Electric Coral</p>
+                <p className="mt-1 text-sm text-slate">#FF5D5D</p>
+              </div>
+            </article>
+
+            <article className="overflow-hidden rounded-lg bg-mint shadow-soft">
+              <div className="h-44"></div>
+              <div className="bg-soft-white p-5">
+                <p className="font-semibold">Ice Mint</p>
+                <p className="mt-1 text-sm text-slate">#B9F4D0</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section
+          aria-labelledby="surface-system"
+          className="grid gap-5 border-t border-cloud pt-10 lg:grid-cols-3"
+        >
+          <article className="rounded-lg bg-soft-white p-7 shadow-soft">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-coral">01</p>
+            <h2 id="surface-system" className="mt-8 text-2xl font-semibold">
+              Soft surface
+            </h2>
+            <p className="mt-3 leading-7 text-slate">
+              Quiet surfaces keep product photography and editorial content in focus.
+            </p>
+          </article>
+
+          <article className="rounded-xl bg-mint p-7 shadow-card">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em]">02</p>
+            <h2 className="mt-8 text-2xl font-semibold">Expressive accent</h2>
+            <p className="mt-3 leading-7 text-ink/70">
+              Accent colors create moments of personality without overwhelming the experience.
+            </p>
+          </article>
+
+          <article className="rounded-2xl bg-ink p-7 text-white shadow-float">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-coral">03</p>
+            <h2 className="mt-8 text-2xl font-semibold">Editorial contrast</h2>
+            <p className="mt-3 leading-7 text-white/65">
+              Deep contrast gives campaigns, launches, and premium collections stronger visual
+              impact.
+            </p>
+          </article>
+        </section>
+
+        <footer className="mt-20 border-t border-cloud pt-6 text-sm text-slate">
+          VOQYRA — Storefront design foundation
+        </footer>
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg className="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg className="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg className="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg className="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   );
 }
 
