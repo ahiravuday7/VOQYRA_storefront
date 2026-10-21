@@ -1,15 +1,18 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource/instrument-serif";
+
+@custom-variant dark (&:is(.dark *));
 
 /*
 |--------------------------------------------------------------------------
-| VOQYRA Storefront — Design System
+| VOQYRA Storefront - Design System
 |--------------------------------------------------------------------------
 |
 | Visual direction:
 | Neo Editorial Commerce
-|
-| This is a completely new identity.
-| Do not reuse Aayu / Aura colors or styling.
 |
 |--------------------------------------------------------------------------
 */
@@ -34,7 +37,7 @@
 
   /*
   |--------------------------------------------------------------------------
-  | Semantic Colors
+  | Semantic Status Colors
   |--------------------------------------------------------------------------
   */
 
@@ -50,23 +53,10 @@
   */
 
   --font-sans:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
 
-  --font-display:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-
-  /*
-  |--------------------------------------------------------------------------
-  | Border Radius
-  |--------------------------------------------------------------------------
-  */
-
-  --radius-xs: 0.375rem;
-  --radius-sm: 0.625rem;
-  --radius-md: 0.875rem;
-  --radius-lg: 1.25rem;
-  --radius-xl: 1.75rem;
-  --radius-2xl: 2.25rem;
+  --font-display: "Instrument Serif", ui-serif, Georgia, Cambria, "Times New Roman", serif;
 
   /*
   |--------------------------------------------------------------------------
@@ -89,12 +79,13 @@
 
 /*
 |--------------------------------------------------------------------------
-| Semantic Application Tokens
+| VOQYRA + shadcn Semantic Tokens
 |--------------------------------------------------------------------------
 */
 
 :root {
   font-family: var(--font-sans);
+
   color: var(--color-ink);
   background: var(--color-porcelain);
 
@@ -106,20 +97,166 @@
 
   color-scheme: light;
 
+  /*
+  |--------------------------------------------------------------------------
+  | Application Surfaces
+  |--------------------------------------------------------------------------
+  */
+
   --background: var(--color-porcelain);
+  --foreground: var(--color-ink);
+
   --surface: var(--color-soft-white);
   --surface-strong: var(--color-white);
 
-  --foreground: var(--color-ink);
   --foreground-muted: var(--color-slate);
 
-  --border: var(--color-cloud);
+  /*
+  |--------------------------------------------------------------------------
+  | shadcn Component Surfaces
+  |--------------------------------------------------------------------------
+  */
+
+  --card: var(--color-soft-white);
+  --card-foreground: var(--color-ink);
+
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-ink);
+
+  /*
+  |--------------------------------------------------------------------------
+  | Primary / Secondary
+  |--------------------------------------------------------------------------
+  */
 
   --primary: var(--color-coral);
   --primary-foreground: var(--color-ink);
 
   --secondary: var(--color-mint);
   --secondary-foreground: var(--color-ink);
+
+  /*
+  |--------------------------------------------------------------------------
+  | Muted / Accent
+  |--------------------------------------------------------------------------
+  */
+
+  --muted: #efeae3;
+  --muted-foreground: var(--color-slate);
+
+  --accent: #efeae3;
+  --accent-foreground: var(--color-ink);
+
+  /*
+  |--------------------------------------------------------------------------
+  | Form / Interaction
+  |--------------------------------------------------------------------------
+  */
+
+  --border: var(--color-cloud);
+  --input: var(--color-cloud);
+  --ring: var(--color-coral);
+
+  --destructive: var(--color-danger);
+
+  /*
+  |--------------------------------------------------------------------------
+  | Charts
+  |--------------------------------------------------------------------------
+  */
+
+  --chart-1: var(--color-coral);
+  --chart-2: var(--color-mint);
+  --chart-3: var(--color-info);
+  --chart-4: var(--color-warning);
+  --chart-5: var(--color-ink);
+
+  /*
+  |--------------------------------------------------------------------------
+  | Radius - shadcn Small preset
+  |--------------------------------------------------------------------------
+  */
+
+  --radius: 0.45rem;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Sidebar / Navigation
+  |--------------------------------------------------------------------------
+  */
+
+  --sidebar: var(--color-soft-white);
+  --sidebar-foreground: var(--color-ink);
+
+  --sidebar-primary: var(--color-coral);
+  --sidebar-primary-foreground: var(--color-ink);
+
+  --sidebar-accent: #efeae3;
+  --sidebar-accent-foreground: var(--color-ink);
+
+  --sidebar-border: var(--color-cloud);
+  --sidebar-ring: var(--color-coral);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Tailwind Semantic Utility Mapping
+|--------------------------------------------------------------------------
+*/
+
+@theme inline {
+  --font-heading: "Instrument Serif", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-xs: calc(var(--radius) * 0.4);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 /*
@@ -169,7 +306,8 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
-button {
+button:not(:disabled),
+[role="button"]:not(:disabled) {
   cursor: pointer;
 }
 
@@ -189,13 +327,6 @@ canvas {
 
 img {
   height: auto;
-}
-
-input,
-button,
-textarea,
-select {
-  margin: 0;
 }
 
 /*
@@ -227,6 +358,7 @@ select {
 
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -248,6 +380,26 @@ select {
 :focus-visible {
   outline: 2px solid var(--color-coral);
   outline-offset: 3px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| shadcn Base Layer
+|--------------------------------------------------------------------------
+*/
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  html {
+    @apply font-sans;
+  }
 }
 
 /*

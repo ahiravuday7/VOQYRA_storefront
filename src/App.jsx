@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 function App() {
   return (
     <main className="min-h-screen bg-porcelain text-ink">
@@ -19,12 +21,12 @@ function App() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <button
+            <Button
               type="button"
-              className="rounded-md bg-coral px-6 py-3.5 font-semibold text-ink transition-transform duration-300 ease-brand hover:-translate-y-0.5"
+              className="h-auto rounded-md px-6 py-3.5 text-base font-semibold transition-transform duration-300 ease-brand hover:-translate-y-0.5"
             >
               Shop the drop
-            </button>
+            </Button>
 
             <button
               type="button"
