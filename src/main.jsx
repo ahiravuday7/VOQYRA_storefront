@@ -1,15 +1,18 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
+import { ErrorBoundary } from "@/app/error-boundary";
+import { AppProviders } from "@/app/providers";
+
 import App from "./App.jsx";
 import "./index.css";
 
-import { TooltipProvider } from "@/components/ui/tooltip";
-
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <TooltipProvider>
-      <App />
-    </TooltipProvider>
+    <ErrorBoundary>
+      <AppProviders>
+        <App />
+      </AppProviders>
+    </ErrorBoundary>
   </StrictMode>,
 );
