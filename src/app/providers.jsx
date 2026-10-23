@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "sonner";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthBootstrap } from "@/features/auth/components/auth-bootstrap";
 import { queryClient } from "@/lib/query-client";
 
 function AppProviders({ children }) {
@@ -11,7 +12,7 @@ function AppProviders({ children }) {
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          {children}
+          <AuthBootstrap>{children}</AuthBootstrap>
 
           <Toaster position="top-right" richColors closeButton />
 

@@ -1,11 +1,16 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
 import App from "./App";
 
 describe("Storefront App", () => {
   it("renders the VOQYRA design-system foundation", () => {
-    render(<App />);
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
+      </MemoryRouter>,
+    );
 
     expect(
       screen.getByRole("heading", {

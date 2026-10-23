@@ -1,6 +1,9 @@
-import { Button } from "@/components/ui/button";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-function App() {
+import { Button } from "@/components/ui/button";
+import { LoginPage } from "@/features/auth/pages/login-page";
+
+function HomePage() {
   return (
     <main className="min-h-screen bg-porcelain text-ink">
       <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-12 lg:py-20">
@@ -43,6 +46,7 @@ function App() {
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate">
                 Foundation
               </p>
+
               <h2 id="color-system" className="mt-2 text-2xl font-semibold tracking-tight">
                 Color system
               </h2>
@@ -53,7 +57,8 @@ function App() {
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <article className="overflow-hidden rounded-lg bg-ink shadow-soft">
-              <div className="h-44"></div>
+              <div className="h-44" />
+
               <div className="bg-soft-white p-5">
                 <p className="font-semibold">Deep Ink</p>
                 <p className="mt-1 text-sm text-slate">#11131A</p>
@@ -61,7 +66,8 @@ function App() {
             </article>
 
             <article className="overflow-hidden rounded-lg border border-cloud bg-porcelain shadow-soft">
-              <div className="h-44"></div>
+              <div className="h-44" />
+
               <div className="border-t border-cloud bg-soft-white p-5">
                 <p className="font-semibold">Warm Porcelain</p>
                 <p className="mt-1 text-sm text-slate">#F7F3ED</p>
@@ -69,7 +75,8 @@ function App() {
             </article>
 
             <article className="overflow-hidden rounded-lg bg-coral shadow-soft">
-              <div className="h-44"></div>
+              <div className="h-44" />
+
               <div className="bg-soft-white p-5">
                 <p className="font-semibold">Electric Coral</p>
                 <p className="mt-1 text-sm text-slate">#FF5D5D</p>
@@ -77,7 +84,8 @@ function App() {
             </article>
 
             <article className="overflow-hidden rounded-lg bg-mint shadow-soft">
-              <div className="h-44"></div>
+              <div className="h-44" />
+
               <div className="bg-soft-white p-5">
                 <p className="font-semibold">Ice Mint</p>
                 <p className="mt-1 text-sm text-slate">#B9F4D0</p>
@@ -92,9 +100,11 @@ function App() {
         >
           <article className="rounded-lg bg-soft-white p-7 shadow-soft">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-coral">01</p>
+
             <h2 id="surface-system" className="mt-8 text-2xl font-semibold">
               Soft surface
             </h2>
+
             <p className="mt-3 leading-7 text-slate">
               Quiet surfaces keep product photography and editorial content in focus.
             </p>
@@ -102,7 +112,9 @@ function App() {
 
           <article className="rounded-xl bg-mint p-7 shadow-card">
             <p className="text-xs font-semibold uppercase tracking-[0.2em]">02</p>
+
             <h2 className="mt-8 text-2xl font-semibold">Expressive accent</h2>
+
             <p className="mt-3 leading-7 text-ink/70">
               Accent colors create moments of personality without overwhelming the experience.
             </p>
@@ -110,7 +122,9 @@ function App() {
 
           <article className="rounded-2xl bg-ink p-7 text-white shadow-float">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-coral">03</p>
+
             <h2 className="mt-8 text-2xl font-semibold">Editorial contrast</h2>
+
             <p className="mt-3 leading-7 text-white/65">
               Deep contrast gives campaigns, launches, and premium collections stronger visual
               impact.
@@ -123,6 +137,18 @@ function App() {
         </footer>
       </section>
     </main>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+
+      <Route path="/login" element={<LoginPage />} />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
