@@ -5,6 +5,9 @@ import { GuestRoute } from "@/app/router/guest-route";
 import { Button } from "@/components/ui/button";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { RegisterPage } from "@/features/auth/pages/register-page";
+import { StorefrontLayout } from "@/components/layout/storefront-layout";
+import { PageContainer } from "@/components/common/page-container";
+import { useSearchParams } from "react-router-dom";
 
 function HomePage() {
   return (
@@ -145,12 +148,32 @@ function HomePage() {
 
 function AccountPlaceholder() {
   return (
-    <main className="min-h-screen bg-porcelain px-6 py-12 text-ink">
-      <div className="mx-auto max-w-7xl">
+    <main className="min-h-screen py-12">
+      <PageContainer>
         <h1 className="font-display text-4xl font-semibold">My Account</h1>
 
         <p className="mt-3 text-slate">Customer account area is protected successfully.</p>
-      </div>
+      </PageContainer>
+    </main>
+  );
+}
+
+function SearchPlaceholder() {
+  const [searchParams] = useSearchParams();
+
+  const query = searchParams.get("q") ?? "";
+
+  return (
+    <main className="min-h-screen py-12">
+      <PageContainer>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-coral">Search</p>
+
+        <h1 className="mt-3 font-display text-4xl font-semibold">Results for “{query}”</h1>
+
+        <p className="mt-4 text-slate">
+          Product search integration will be added in the public catalog phase.
+        </p>
+      </PageContainer>
     </main>
   );
 }
@@ -158,15 +181,19 @@ function AccountPlaceholder() {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route element={<StorefrontLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/search" element={<SearchPlaceholder />} />
+
+        <Route element={<CustomerRoute />}>
+          <Route path="/account" element={<AccountPlaceholder />} />
+        </Route>
+      </Route>
 
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Route>
 
-      <Route element={<CustomerRoute />}>
-        <Route path="/account" element={<AccountPlaceholder />} />
+        <Route path="/register" element={<RegisterPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
