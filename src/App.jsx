@@ -1,7 +1,10 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
+import { CustomerRoute } from "@/app/router/customer-route";
+import { GuestRoute } from "@/app/router/guest-route";
 import { Button } from "@/components/ui/button";
 import { LoginPage } from "@/features/auth/pages/login-page";
+import { RegisterPage } from "@/features/auth/pages/register-page";
 
 function HomePage() {
   return (
@@ -140,12 +143,31 @@ function HomePage() {
   );
 }
 
+function AccountPlaceholder() {
+  return (
+    <main className="min-h-screen bg-porcelain px-6 py-12 text-ink">
+      <div className="mx-auto max-w-7xl">
+        <h1 className="font-display text-4xl font-semibold">My Account</h1>
+
+        <p className="mt-3 text-slate">Customer account area is protected successfully.</p>
+      </div>
+    </main>
+  );
+}
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
 
-      <Route path="/login" element={<LoginPage />} />
+      <Route element={<GuestRoute />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
+
+      <Route element={<CustomerRoute />}>
+        <Route path="/account" element={<AccountPlaceholder />} />
+      </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

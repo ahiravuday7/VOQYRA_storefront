@@ -5,17 +5,20 @@ import { useAuthStore } from "@/features/auth/store/auth-store";
 import { getAuthUser } from "@/features/auth/utils/get-auth-user";
 
 function useAuthBootstrap() {
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   const setUser = useAuthStore((state) => state.setUser);
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const currentUserQuery = useCurrentUser();
 
+  const authUser = currentUserQuery.isSuccess ? getAuthUser(currentUserQuery.data) : null;
+
   useEffect(() => {
     if (currentUserQuery.isSuccess) {
-      const user = getAuthUser(currentUserQuery.data);
-
-      if (user) {
-        setUser(user);
+      if (authUser) {
+        setUser(authUser);
       } else {
         clearAuth();
       }
@@ -24,15 +27,29 @@ function useAuthBootstrap() {
     if (currentUserQuery.isError) {
       clearAuth();
     }
-  }, [
-    clearAuth,
-    currentUserQuery.data,
-    currentUserQuery.isError,
-    currentUserQuery.isSuccess,
-    setUser,
-  ]);
+  }, [authUser, clearAuth, currentUserQuery.isError, currentUserQuery.isSuccess, setUser]);
 
-  return currentUserQuery;
+  let isStoreSynchronized = false;
+
+  if (currentUserQuery.isSuccess && authUser) {
+    isStoreSynchronized =
+      isAuthenticated && user?.id === authUser.id && user?.role === authUser.role;
+  }
+
+  if (currentUserQuery.isSuccess && !authUser) {
+    isStoreSynchronized = !isAuthenticated && !user;
+  }
+
+  if (currentUserQuery.isError) {
+    isStoreSynchronized = !isAuthenticated && !user;
+  }
+
+  const isBootstrapping = currentUserQuery.isPending || !isStoreSynchronized;
+
+  return {
+    ...currentUserQuery,
+    isBootstrapping,
+  };
 }
 
 export { useAuthBootstrap };

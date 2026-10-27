@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { login } from "@/features/auth/api/auth-api";
-import { authQueryKeys } from "@/features/auth/api/auth-query-keys";
 import { useAuthStore } from "@/features/auth/store/auth-store";
 import { getAuthUser } from "@/features/auth/utils/get-auth-user";
+import { queryKeys } from "@/lib/query-keys";
 
 function useLogin() {
   const queryClient = useQueryClient();
@@ -18,10 +18,10 @@ function useLogin() {
       if (user) {
         setUser(user);
 
-        queryClient.setQueryData(authQueryKeys.currentUser(), data);
+        queryClient.setQueryData(queryKeys.auth.me(), data);
       } else {
         queryClient.invalidateQueries({
-          queryKey: authQueryKeys.currentUser(),
+          queryKey: queryKeys.auth.me(),
         });
       }
     },

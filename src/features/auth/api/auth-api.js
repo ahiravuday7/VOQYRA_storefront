@@ -1,5 +1,11 @@
 import { apiClient } from "@/lib/api-client";
 
+async function register(payload) {
+  const response = await apiClient.post("/auth/register", payload);
+
+  return response.data;
+}
+
 async function login(credentials) {
   const response = await apiClient.post("/auth/login", credentials);
 
@@ -24,4 +30,4 @@ async function logout() {
   return response.data;
 }
 
-export { getCurrentUser, login, logout, refreshSession };
+export { getCurrentUser, login, logout, refreshSession, register };

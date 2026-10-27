@@ -32,13 +32,15 @@ function LoginPage() {
     try {
       await loginMutation.mutateAsync(values);
 
-      const destination = location.state?.from?.pathname ?? "/";
+      const from = location.state?.from;
+
+      const destination = from ? `${from.pathname}${from.search ?? ""}${from.hash ?? ""}` : "/";
 
       navigate(destination, {
         replace: true,
       });
-    } catch {
-      toast.error("Unable to sign in. Check your email and password.");
+    } catch (error) {
+      toast.error(error?.message ?? "Unable to sign in. Check your email and password.");
     }
   };
 
@@ -98,7 +100,11 @@ function LoginPage() {
 
           <p className="mt-8 text-center text-sm text-slate">
             New to VOQYRA?{" "}
-            <Link to="/register" className="font-semibold text-ink underline underline-offset-4">
+            <Link
+              to="/register"
+              state={location.state}
+              className="font-semibold text-ink underline underline-offset-4"
+            >
               Create an account
             </Link>
           </p>
