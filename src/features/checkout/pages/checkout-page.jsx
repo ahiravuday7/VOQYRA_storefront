@@ -28,6 +28,9 @@ import { OrderCreationResult } from "@/features/orders/components/order-creation
 import { buildOrderRequest } from "@/features/checkout/utils/build-order-request";
 import { createCheckoutIdempotencyKey } from "@/features/checkout/utils/checkout-idempotency";
 
+import { useClearCart } from "@/features/cart/hooks/use-cart-mutations";
+import { CodOrderConfirmation } from "@/features/checkout/components/cod-order-confirmation";
+
 const CART_CONFLICT_ERROR_CODES = new Set([
   "ORDER_PRODUCT_UNAVAILABLE",
   "ORDER_VARIANT_UNAVAILABLE",
@@ -42,6 +45,8 @@ function CheckoutPage() {
   const user = useAuthStore((state) => state.user);
 
   const cartQuery = useCart();
+
+  const clearCartMutation = useClearCart();
 
   const createOrderMutation = useCreateOrder();
 
@@ -105,12 +110,6 @@ function CheckoutPage() {
 
   const hasUnavailableItems = items.some((item) => !item.availability?.isAvailable);
 
-  const orderResult = createOrderMutation.data;
-
-  if (orderResult) {
-    return <OrderCreationResult result={orderResult} />;
-  }
-
   const onContinueToReview = () => {
     setStep(CHECKOUT_STEPS.REVIEW);
 
@@ -118,6 +117,16 @@ function CheckoutPage() {
       top: 0,
       behavior: "smooth",
     });
+  };
+
+  const clearCompletedCodCart = async () => {
+    try {
+      await clearCartMutation.mutateAsync();
+
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const handlePlaceOrder = async (values) => {
@@ -142,6 +151,36 @@ function CheckoutPage() {
 
         idempotencyKey: idempotencyKeyRef.current,
       });
+
+      /*
+       * The Order now exists.
+       *
+       * Never retry order creation merely because
+       * a post-order UI cleanup step fails.
+       */
+      idempotencyKeyRef.current = null;
+
+      resetCheckout();
+
+      if (result.order.payment?.method === "cash-on-delivery") {
+        const cartCleared = await clearCompletedCodCart();
+
+        if (!cartCleared) {
+          toast.warning(
+            "Your order is placed, but we couldn't clear your bag. Please retry the bag cleanup.",
+          );
+
+          return;
+        }
+
+        toast.success(
+          result.wasReused
+            ? "Your COD order was recovered safely."
+            : "Your COD order has been placed successfully.",
+        );
+
+        return;
+      }
 
       toast.success(
         result.wasReused
@@ -171,6 +210,35 @@ function CheckoutPage() {
 
     submitOrder();
   };
+
+  const handleRetryCodCartClear = async () => {
+    const cleared = await clearCompletedCodCart();
+
+    if (cleared) {
+      toast.success("Your bag has been cleared.");
+
+      return;
+    }
+
+    toast.error("Your order is safe, but we still couldn't clear your bag.");
+  };
+
+  const orderResult = createOrderMutation.data;
+
+  if (orderResult?.order?.payment?.method === "cash-on-delivery") {
+    return (
+      <CodOrderConfirmation
+        result={orderResult}
+        isCartClearing={clearCartMutation.isPending}
+        cartClearError={clearCartMutation.error}
+        onRetryCartClear={handleRetryCodCartClear}
+      />
+    );
+  }
+
+  if (orderResult) {
+    return <OrderCreationResult result={orderResult} />;
+  }
 
   if (cartQuery.isPending) {
     return (
