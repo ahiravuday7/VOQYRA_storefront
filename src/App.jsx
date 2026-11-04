@@ -23,6 +23,7 @@ import { ProductPage } from "@/features/products/pages/product-page";
 
 import { WishlistPage } from "@/features/wishlist/pages/wishlist-page";
 import { CartPage } from "@/features/cart/pages/cart-page";
+import { CheckoutPage } from "@/features/checkout/pages/checkout-page";
 import { Button } from "@/components/ui/button";
 import { useLogout } from "@/features/auth/hooks/use-logout";
 
@@ -64,18 +65,6 @@ function AccountPlaceholder() {
   );
 }
 
-function CheckoutPlaceholder() {
-  return (
-    <main className="min-h-screen py-12">
-      <PageContainer>
-        <h1 className="font-display text-4xl font-semibold">Checkout</h1>
-
-        <p className="mt-3 text-slate">Checkout form comes in Part 32.</p>
-      </PageContainer>
-    </main>
-  );
-}
-
 function App() {
   return (
     <Routes>
@@ -86,7 +75,7 @@ function App() {
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/cart" element={<CartPage />} />
 
-          <Route path="/checkout" element={<CheckoutPlaceholder />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/account" element={<AccountPlaceholder />} />
         </Route>
 
