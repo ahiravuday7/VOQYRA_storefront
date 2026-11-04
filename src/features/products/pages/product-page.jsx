@@ -1,4 +1,3 @@
-import { toast } from "sonner";
 import { Link, useParams } from "react-router-dom";
 
 import { Breadcrumbs } from "@/components/common/breadcrumbs";
@@ -13,6 +12,7 @@ import { ProductPurchasePanel } from "@/features/products/components/product-pur
 import { useProduct } from "@/features/products/hooks/use-product";
 import { useWishlistManager } from "@/features/wishlist/hooks/use-wishlist-manager";
 import { useTrackRecentlyViewed } from "@/features/recently-viewed/hooks/use-track-recently-viewed";
+import { useCartManager } from "@/features/cart/hooks/use-cart-manager";
 
 function ProductPage() {
   const { slug } = useParams();
@@ -25,13 +25,7 @@ function ProductPage() {
 
   useTrackRecentlyViewed(product?.id);
 
-  const handleAddToCart = ({ variant, quantity }) => {
-    /*
-     * Part 29 will replace this with
-     * the real cart mutation.
-     */
-    toast.info(`Selected ${variant.size} × ${quantity}. Cart API integration comes in Part 29.`);
-  };
+  const { addMutation, addToCart } = useCartManager();
 
   if (productQuery.isPending) {
     return (
@@ -140,7 +134,14 @@ function ProductPage() {
               <ProductPurchasePanel
                 key={product.id}
                 product={product}
-                onAddToCart={handleAddToCart}
+                onAddToCart={({ variant, quantity }) =>
+                  addToCart({
+                    product,
+                    variant,
+                    quantity,
+                  })
+                }
+                isAddToCartPending={addMutation.isPending}
                 onWishlist={() => toggleWishlist(product)}
                 isWishlisted={wishlistedProductIds.has(product.id)}
                 isWishlistPending={isPendingFor(product.id)}

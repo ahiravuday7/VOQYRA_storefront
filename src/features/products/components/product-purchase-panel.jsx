@@ -15,6 +15,7 @@ function ProductPurchasePanel({
   onWishlist,
   isWishlisted = false,
   isWishlistPending = false,
+  isAddToCartPending = false,
 }) {
   const variants = useMemo(() => product.variants ?? [], [product.variants]);
 
@@ -76,7 +77,7 @@ function ProductPurchasePanel({
 
   const availability = selectedVariant?.availability;
 
-  const maximumQuantity = Math.max(availability?.availableStock ?? 1, 1);
+  const maximumQuantity = Math.max(Math.min(availability?.availableStock ?? 1, 99), 1);
 
   const isInStock = Boolean(selectedVariant && availability?.isInStock);
 
@@ -234,7 +235,8 @@ function ProductPurchasePanel({
         <Button
           type="button"
           size="lg"
-          disabled={!isInStock}
+          className="w-full"
+          disabled={!isInStock || isAddToCartPending}
           onClick={() =>
             onAddToCart?.({
               product,
@@ -242,10 +244,10 @@ function ProductPurchasePanel({
               quantity,
             })
           }
-          className="h-13"
         >
           <ShoppingBag className="size-4" aria-hidden="true" />
-          Add to cart
+
+          {isAddToCartPending ? "Adding..." : "Add to cart"}
         </Button>
 
         <Button

@@ -22,6 +22,7 @@ import {
 } from "@/features/products/utils/product-price";
 import { useStorefrontUiStore } from "@/stores/storefront-ui-store";
 import { useWishlistManager } from "@/features/wishlist/hooks/use-wishlist-manager";
+import { useCartManager } from "@/features/cart/hooks/use-cart-manager";
 
 function getColorKey(variant) {
   return `${variant.color?.name ?? ""}|${variant.color?.code ?? ""}`;
@@ -120,7 +121,7 @@ function QuickShopContent({ product, closeQuickShop }) {
 
   const availableStock = availability?.availableStock ?? 0;
 
-  const maximumQuantity = Math.max(availableStock, 1);
+  const maximumQuantity = Math.max(Math.min(availableStock, 99), 1);
 
   const handleColorChange = (colorKey) => {
     setSelectedColorKey(colorKey);
@@ -140,27 +141,31 @@ function QuickShopContent({ product, closeQuickShop }) {
     setQuantity(1);
   };
 
-  const handleAddToCart = () => {
+  const { isPendingFor, toggleWishlist, wishlistedProductIds } = useWishlistManager();
+
+  const isWishlisted = wishlistedProductIds.has(product.id);
+
+  const isWishlistPending = isPendingFor(product.id);
+
+  const { addMutation, addToCart } = useCartManager();
+
+  const handleAddToCart = async () => {
     if (!selectedVariant) {
       toast.error("Please select a product variant.");
 
       return;
     }
 
-    /*
-     * Part 29 will replace this
-     * with the real cart mutation.
-     */
-    toast.info(
-      `Selected ${selectedVariant.size} × ${quantity}. Cart API integration comes in Part 29.`,
-    );
+    const added = await addToCart({
+      product,
+      variant: selectedVariant,
+      quantity,
+    });
+
+    if (added) {
+      setQuantity(1);
+    }
   };
-
-  const { isPendingFor, toggleWishlist, wishlistedProductIds } = useWishlistManager();
-
-  const isWishlisted = wishlistedProductIds.has(product.id);
-
-  const isWishlistPending = isPendingFor(product.id);
 
   return (
     <div>
@@ -326,11 +331,12 @@ function QuickShopContent({ product, closeQuickShop }) {
           type="button"
           size="lg"
           className="w-full"
-          disabled={!isInStock}
+          disabled={!isInStock || addMutation.isPending}
           onClick={handleAddToCart}
         >
           <ShoppingBag className="size-4" aria-hidden="true" />
-          Add to cart
+
+          {addMutation.isPending ? "Adding..." : "Add to cart"}
         </Button>
 
         <Button
