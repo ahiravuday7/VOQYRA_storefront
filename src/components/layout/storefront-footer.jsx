@@ -28,6 +28,14 @@ function StorefrontFooter() {
                 New Drop
               </Link>
 
+              <Link to="/brands" className="text-sm hover:text-coral">
+                Brands
+              </Link>
+
+              <Link to="/collections" className="text-sm hover:text-coral">
+                Collections
+              </Link>
+
               <Link to="/wishlist" className="text-sm hover:text-coral">
                 Wishlist
               </Link>

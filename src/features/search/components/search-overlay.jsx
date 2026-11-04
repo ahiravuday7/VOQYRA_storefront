@@ -28,9 +28,13 @@ function SearchOverlay() {
       return;
     }
 
-    closeSearch();
+    const searchParams = new URLSearchParams({
+      search: trimmedQuery,
+    });
 
-    navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+    navigate(`/search?${searchParams.toString()}`);
+
+    closeSearch();
 
     setQuery("");
   };

@@ -6,6 +6,7 @@ import { queryKeys } from "@/lib/query-keys";
 
 function useLogout() {
   const queryClient = useQueryClient();
+
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
   return useMutation({
