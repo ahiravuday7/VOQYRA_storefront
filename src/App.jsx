@@ -22,6 +22,7 @@ import { ShopPage } from "@/features/products/pages/shop-page";
 import { ProductPage } from "@/features/products/pages/product-page";
 
 import { WishlistPage } from "@/features/wishlist/pages/wishlist-page";
+import { CartPage } from "@/features/cart/pages/cart-page";
 import { Button } from "@/components/ui/button";
 import { useLogout } from "@/features/auth/hooks/use-logout";
 
@@ -63,18 +64,6 @@ function AccountPlaceholder() {
   );
 }
 
-function CartPlaceholder() {
-  return (
-    <main className="min-h-screen py-12">
-      <PageContainer>
-        <h1 className="font-display text-4xl font-semibold">Your Bag</h1>
-
-        <p className="mt-3 text-slate">Full cart page comes in Part 31.</p>
-      </PageContainer>
-    </main>
-  );
-}
-
 function CheckoutPlaceholder() {
   return (
     <main className="min-h-screen py-12">
@@ -95,7 +84,7 @@ function App() {
 
         <Route element={<CustomerRoute />}>
           <Route path="/wishlist" element={<WishlistPage />} />
-          <Route path="/cart" element={<CartPlaceholder />} />
+          <Route path="/cart" element={<CartPage />} />
 
           <Route path="/checkout" element={<CheckoutPlaceholder />} />
           <Route path="/account" element={<AccountPlaceholder />} />
