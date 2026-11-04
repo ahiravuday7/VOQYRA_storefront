@@ -35,7 +35,13 @@ function normalizeApiError(error) {
   return {
     status: response?.status ?? null,
 
-    code: responseData?.code ?? responseData?.error?.code ?? error?.code ?? null,
+    code:
+      responseData?.errorCode ??
+      responseData?.code ??
+      responseData?.error?.errorCode ??
+      responseData?.error?.code ??
+      error?.code ??
+      null,
 
     message:
       responseData?.message ??

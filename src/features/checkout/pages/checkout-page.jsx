@@ -1,5 +1,5 @@
 import { ArrowLeft, Check, CreditCard, IndianRupee, MapPin, ShoppingBag } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,10 +20,34 @@ import { CheckoutOrderReview } from "@/features/checkout/components/checkout-ord
 import { checkoutSchema } from "@/features/checkout/schemas/checkout-schema";
 import { CHECKOUT_STEPS, useCheckoutStore } from "@/features/checkout/store/checkout-store";
 
+import { toast } from "sonner";
+
+import { useCreateOrder } from "@/features/orders/hooks/use-create-order";
+import { OrderCreationResult } from "@/features/orders/components/order-creation-result";
+
+import { buildOrderRequest } from "@/features/checkout/utils/build-order-request";
+import { createCheckoutIdempotencyKey } from "@/features/checkout/utils/checkout-idempotency";
+
+const CART_CONFLICT_ERROR_CODES = new Set([
+  "ORDER_PRODUCT_UNAVAILABLE",
+  "ORDER_VARIANT_UNAVAILABLE",
+  "ORDER_PRODUCT_IMAGE_UNAVAILABLE",
+  "ORDER_PRODUCT_PRICE_UNAVAILABLE",
+  "ORDER_PRODUCT_INVENTORY_INVALID",
+  "ORDER_INSUFFICIENT_AVAILABLE_STOCK",
+  "ORDER_INVENTORY_RESERVATION_CONFLICT",
+]);
+
 function CheckoutPage() {
   const user = useAuthStore((state) => state.user);
 
   const cartQuery = useCart();
+
+  const createOrderMutation = useCreateOrder();
+
+  const idempotencyKeyRef = useRef(null);
+
+  const submittingRef = useRef(false);
 
   const step = useCheckoutStore((state) => state.step);
 
@@ -81,6 +105,12 @@ function CheckoutPage() {
 
   const hasUnavailableItems = items.some((item) => !item.availability?.isAvailable);
 
+  const orderResult = createOrderMutation.data;
+
+  if (orderResult) {
+    return <OrderCreationResult result={orderResult} />;
+  }
+
   const onContinueToReview = () => {
     setStep(CHECKOUT_STEPS.REVIEW);
 
@@ -88,6 +118,58 @@ function CheckoutPage() {
       top: 0,
       behavior: "smooth",
     });
+  };
+
+  const handlePlaceOrder = async (values) => {
+    if (submittingRef.current) {
+      return;
+    }
+
+    submittingRef.current = true;
+
+    try {
+      const orderData = buildOrderRequest({
+        cart,
+        checkoutValues: values,
+      });
+
+      if (!idempotencyKeyRef.current) {
+        idempotencyKeyRef.current = createCheckoutIdempotencyKey();
+      }
+
+      const result = await createOrderMutation.mutateAsync({
+        orderData,
+
+        idempotencyKey: idempotencyKeyRef.current,
+      });
+
+      toast.success(
+        result.wasReused
+          ? "Your existing order was recovered safely."
+          : "Order created successfully.",
+      );
+    } catch (error) {
+      if (
+        error?.code === "ORDER_IDEMPOTENCY_KEY_INVALID" ||
+        error?.code === "ORDER_IDEMPOTENCY_KEY_REUSED"
+      ) {
+        idempotencyKeyRef.current = null;
+      }
+
+      if (CART_CONFLICT_ERROR_CODES.has(error?.code)) {
+        await cartQuery.refetch();
+      }
+
+      toast.error(error?.message ?? "Unable to place your order. Please try again.");
+    } finally {
+      submittingRef.current = false;
+    }
+  };
+
+  const handlePlaceOrderClick = () => {
+    const submitOrder = handleSubmit(handlePlaceOrder);
+
+    submitOrder();
   };
 
   if (cartQuery.isPending) {
@@ -599,19 +681,30 @@ function CheckoutPage() {
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setStep(CHECKOUT_STEPS.DETAILS)}
+                  onClick={() => {
+                    idempotencyKeyRef.current = null;
+
+                    setStep(CHECKOUT_STEPS.DETAILS);
+                  }}
                 >
                   <ArrowLeft className="size-4" aria-hidden="true" />
                   Edit details
                 </Button>
 
                 <div className="sm:text-right">
-                  <Button type="button" size="lg" disabled className="sm:min-w-48">
-                    Place order
+                  <Button
+                    type="button"
+                    size="lg"
+                    className="sm:min-w-48"
+                    disabled={createOrderMutation.isPending}
+                    onClick={handlePlaceOrderClick}
+                  >
+                    {createOrderMutation.isPending ? "Placing order..." : "Place order"}
                   </Button>
 
                   <p className="mt-2 max-w-xs text-xs leading-5 text-slate">
-                    Order submission will be connected in Part 33.
+                    Your final price and inventory are verified again by the backend before the
+                    order is created.
                   </p>
                 </div>
               </div>
