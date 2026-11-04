@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/features/auth/store/auth-store";
 import { useAddCartItem } from "@/features/cart/hooks/use-cart-mutations";
 import { useCart } from "@/features/cart/hooks/use-cart";
+import { useStorefrontUiStore } from "@/stores/storefront-ui-store";
 
 function useCartManager() {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ function useCartManager() {
   });
 
   const addMutation = useAddCartItem();
+
+  const openCartDrawer = useStorefrontUiStore((state) => state.openCartDrawer);
 
   const addToCart = async ({ product, variant, quantity }) => {
     if (!isCustomer) {
@@ -46,7 +49,7 @@ function useCartManager() {
       });
 
       toast.success(`${product.name} added to your bag.`);
-
+      openCartDrawer();
       return true;
     } catch (error) {
       toast.error(error?.message ?? "Unable to add this product to your bag.");

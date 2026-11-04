@@ -35,6 +35,30 @@ function AccountPlaceholder() {
   );
 }
 
+function CartPlaceholder() {
+  return (
+    <main className="min-h-screen py-12">
+      <PageContainer>
+        <h1 className="font-display text-4xl font-semibold">Your Bag</h1>
+
+        <p className="mt-3 text-slate">Full cart page comes in Part 31.</p>
+      </PageContainer>
+    </main>
+  );
+}
+
+function CheckoutPlaceholder() {
+  return (
+    <main className="min-h-screen py-12">
+      <PageContainer>
+        <h1 className="font-display text-4xl font-semibold">Checkout</h1>
+
+        <p className="mt-3 text-slate">Checkout form comes in Part 32.</p>
+      </PageContainer>
+    </main>
+  );
+}
+
 function App() {
   return (
     <Routes>
@@ -43,6 +67,9 @@ function App() {
 
         <Route element={<CustomerRoute />}>
           <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/cart" element={<CartPlaceholder />} />
+
+          <Route path="/checkout" element={<CheckoutPlaceholder />} />
           <Route path="/account" element={<AccountPlaceholder />} />
         </Route>
 

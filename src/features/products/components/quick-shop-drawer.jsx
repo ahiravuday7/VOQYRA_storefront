@@ -164,6 +164,7 @@ function QuickShopContent({ product, closeQuickShop }) {
 
     if (added) {
       setQuantity(1);
+      closeQuickShop();
     }
   };
 

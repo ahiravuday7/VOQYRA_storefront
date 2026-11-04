@@ -13,9 +13,20 @@ import { useAuthStore } from "@/features/auth/store/auth-store";
 import { useCategories } from "@/features/categories/hooks/use-categories";
 import { useCategoryTree } from "@/features/categories/hooks/use-category-tree";
 import { useStorefrontUiStore } from "@/stores/storefront-ui-store";
+import { useCart } from "@/features/cart/hooks/use-cart";
 
 function StorefrontHeader() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  const user = useAuthStore((state) => state.user);
+
+  const isCustomer = Boolean(user) && user.role === "customer";
+
+  const cartQuery = useCart({
+    enabled: isCustomer,
+  });
+
+  const cartQuantity = cartQuery.data?.totalQuantity ?? 0;
 
   const openCartDrawer = useStorefrontUiStore((state) => state.openCartDrawer);
 
@@ -184,9 +195,11 @@ function StorefrontHeader() {
           >
             <ShoppingBag className="size-5" />
 
-            <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-coral text-[10px] font-semibold text-white">
-              0
-            </span>
+            {isCustomer && cartQuantity > 0 && (
+              <span className="absolute right-0 top-0 flex min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-semibold text-white">
+                {cartQuantity > 99 ? "99+" : cartQuantity}
+              </span>
+            )}
           </button>
         </div>
       </div>
