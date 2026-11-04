@@ -18,10 +18,11 @@ function ProductGallery({ images = [], productName }) {
     sortedImages.find((image) => image.id === activeImageId) ?? sortedImages[0] ?? null;
 
   return (
-    <div>
+    <div className="min-w-0 w-full max-w-full">
       {/* Mobile */}
-      <div className="md:hidden">
+      <div className="min-w-0 w-full max-w-full overflow-hidden md:hidden">
         <Swiper
+          className="min-w-0 w-full max-w-full"
           modules={[Pagination]}
           pagination={{
             clickable: true,

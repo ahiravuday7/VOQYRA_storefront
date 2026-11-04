@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 
 import { CustomerRoute } from "@/app/router/customer-route";
 import { GuestRoute } from "@/app/router/guest-route";
@@ -22,14 +22,42 @@ import { ShopPage } from "@/features/products/pages/shop-page";
 import { ProductPage } from "@/features/products/pages/product-page";
 
 import { WishlistPage } from "@/features/wishlist/pages/wishlist-page";
+import { Button } from "@/components/ui/button";
+import { useLogout } from "@/features/auth/hooks/use-logout";
 
 function AccountPlaceholder() {
+  const navigate = useNavigate();
+  const logoutMutation = useLogout();
+
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+
+      navigate("/", {
+        replace: true,
+      });
+    } catch {
+      // Logout error handling can be polished
+      // when we build the full Account area.
+    }
+  };
+
   return (
     <main className="min-h-screen py-12">
       <PageContainer>
         <h1 className="font-display text-4xl font-semibold">My Account</h1>
 
         <p className="mt-3 text-slate">Customer account area is protected successfully.</p>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="mt-6"
+          disabled={logoutMutation.isPending}
+          onClick={handleLogout}
+        >
+          {logoutMutation.isPending ? "Signing out..." : "Sign out"}
+        </Button>
       </PageContainer>
     </main>
   );

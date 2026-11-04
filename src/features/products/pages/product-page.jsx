@@ -87,10 +87,12 @@ function ProductPage() {
           ].filter(Boolean)}
         />
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)] lg:gap-14">
-          <ProductGallery images={product.images} productName={product.name} />
+        <div className="mt-8 grid min-w-0 gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)] lg:gap-14">
+          <div className="min-w-0">
+            <ProductGallery images={product.images} productName={product.name} />
+          </div>
 
-          <div className="lg:sticky lg:top-28 lg:self-start">
+          <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
             <div className="relative">
               <div className="mb-5 flex flex-wrap gap-2">
                 {product.isNewArrival && (
