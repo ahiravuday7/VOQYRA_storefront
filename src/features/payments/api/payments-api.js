@@ -31,4 +31,43 @@ async function initiateOnlinePayment({ orderId }) {
   };
 }
 
-export { initiateOnlinePayment };
+async function confirmRazorpayPayment({
+  orderId,
+  paymentTransactionId,
+  razorpayOrderId,
+  razorpayPaymentId,
+  razorpaySignature,
+}) {
+  const response = await apiClient.post(
+    `/orders/${encodeURIComponent(orderId)}/payments/${encodeURIComponent(
+      paymentTransactionId,
+    )}/confirm`,
+    {
+      razorpay_order_id: razorpayOrderId,
+
+      razorpay_payment_id: razorpayPaymentId,
+
+      razorpay_signature: razorpaySignature,
+    },
+  );
+
+  const data = response.data?.data;
+
+  if (!data?.payment || !data?.providerState || !data?.orderFinalization) {
+    throw new Error("Payment confirmation response is incomplete.");
+  }
+
+  return {
+    action: data.action ?? null,
+
+    providerState: data.providerState,
+
+    orderFinalization: data.orderFinalization,
+
+    payment: data.payment,
+
+    order: data.order ?? null,
+  };
+}
+
+export { confirmRazorpayPayment, initiateOnlinePayment };

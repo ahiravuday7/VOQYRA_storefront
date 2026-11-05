@@ -11,27 +11,84 @@ import { Button } from "@/components/ui/button";
 import { useInitiateOnlinePayment } from "@/features/payments/hooks/use-initiate-online-payment";
 import { loadRazorpayCheckout } from "@/features/payments/utils/load-razorpay-checkout";
 
+import { useConfirmRazorpayPayment } from "@/features/payments/hooks/use-confirm-razorpay-payment";
+
 function OnlinePaymentCheckout({ result }) {
   const order = result.order;
 
   const paymentMutation = useInitiateOnlinePayment();
 
-  const [isOpeningCheckout, setIsOpeningCheckout] = useState(false);
+  const confirmationMutation = useConfirmRazorpayPayment();
 
-  const [providerResponse, setProviderResponse] = useState(null);
+  const [isOpeningCheckout, setIsOpeningCheckout] = useState(false);
 
   const [providerFailure, setProviderFailure] = useState(null);
 
+  const handleRazorpayResponse = async ({ paymentTransactionId, razorpayResponse }) => {
+    try {
+      const confirmation = await confirmationMutation.mutateAsync({
+        orderId: order.id,
+
+        paymentTransactionId,
+
+        razorpayOrderId: razorpayResponse.razorpay_order_id,
+
+        razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+
+        razorpaySignature: razorpayResponse.razorpay_signature,
+      });
+
+      const paymentStatus = confirmation.payment?.status;
+
+      const finalized = confirmation.orderFinalization?.finalized === true;
+
+      if (paymentStatus === "paid" && finalized && confirmation.order) {
+        toast.success("Payment verified successfully.");
+
+        return;
+      }
+
+      if (paymentStatus === "authorized") {
+        toast.message("Payment is authorized and is awaiting final capture.");
+
+        return;
+      }
+
+      if (confirmation.providerState?.action === "late-capture-manual-review") {
+        toast.warning("Payment was received, but this order requires payment review.");
+
+        return;
+      }
+
+      toast.message("Payment verification is still processing.");
+    } catch (error) {
+      /*
+       * Important:
+       *
+       * Do NOT say "payment failed".
+       *
+       * Razorpay may have processed money
+       * while our browser confirmation
+       * request failed. Webhook processing
+       * may still reconcile it.
+       */
+      toast.error(
+        error?.message ??
+          "We couldn't verify the payment yet. Please do not pay again immediately.",
+      );
+    }
+  };
+
   const handlePay = async () => {
-    if (isOpeningCheckout || paymentMutation.isPending) {
+    if (isOpeningCheckout || paymentMutation.isPending || confirmationMutation.isPending) {
       return;
     }
 
     setIsOpeningCheckout(true);
 
-    setProviderResponse(null);
-
     setProviderFailure(null);
+
+    confirmationMutation.reset();
 
     try {
       const Razorpay = await loadRazorpayCheckout();
@@ -74,22 +131,18 @@ function OnlinePaymentCheckout({ result }) {
         },
 
         /*
-         * Part 36 will send these values
-         * to our backend confirmation API.
+         * Send Razorpay callback values to
+         * our backend confirmation API.
          *
          * Browser callback alone is NOT
          * trusted as final payment truth.
          */
         handler: (razorpayResponse) => {
-          setProviderResponse({
+          void handleRazorpayResponse({
             paymentTransactionId: payment.id,
 
-            ...razorpayResponse,
+            razorpayResponse,
           });
-
-          toast.success(
-            "Razorpay returned payment details. Backend verification is the next step.",
-          );
         },
       });
 
@@ -119,7 +172,20 @@ function OnlinePaymentCheckout({ result }) {
     }
   };
 
-  const isBusy = isOpeningCheckout || paymentMutation.isPending;
+  const isBusy = isOpeningCheckout || paymentMutation.isPending || confirmationMutation.isPending;
+
+  const confirmationResult = confirmationMutation.data;
+
+  const displayOrder = confirmationResult?.order ?? order;
+
+  const confirmedPaymentStatus = confirmationResult?.payment?.status;
+
+  const providerStatus = confirmationResult?.providerState?.status;
+
+  const orderFinalized = confirmationResult?.orderFinalization?.finalized === true;
+
+  const requiresManualReview =
+    confirmationResult?.providerState?.action === "late-capture-manual-review";
 
   return (
     <main className="min-h-screen py-8 sm:py-12">
@@ -162,20 +228,20 @@ function OnlinePaymentCheckout({ result }) {
               <div className="flex items-center justify-between gap-4 py-4">
                 <span className="text-sm text-slate">Order number</span>
 
-                <span className="text-sm font-semibold">{order.orderNumber}</span>
+                <span className="text-sm font-semibold">{displayOrder.orderNumber}</span>
               </div>
 
               <div className="flex items-center justify-between gap-4 py-4">
                 <span className="text-sm text-slate">Order status</span>
 
-                <span className="text-sm font-semibold capitalize">{order.status}</span>
+                <span className="text-sm font-semibold capitalize">{displayOrder.status}</span>
               </div>
 
               <div className="flex items-center justify-between gap-4 py-4">
                 <span className="text-sm text-slate">Payment status</span>
 
                 <span className="text-sm font-semibold capitalize">
-                  {order.payment?.status ?? "pending"}
+                  {displayOrder.payment?.status ?? "pending"}
                 </span>
               </div>
 
@@ -183,8 +249,8 @@ function OnlinePaymentCheckout({ result }) {
                 <span className="text-sm text-slate">Amount</span>
 
                 <Currency
-                  value={order.totals?.grandTotal ?? 0}
-                  currency={order.totals?.currency ?? "INR"}
+                  value={displayOrder.totals?.grandTotal ?? 0}
+                  currency={displayOrder.totals?.currency ?? "INR"}
                   className="text-lg font-semibold"
                 />
               </div>
@@ -227,13 +293,83 @@ function OnlinePaymentCheckout({ result }) {
               </div>
             )}
 
-            {providerResponse && (
-              <div className="mt-5 rounded-lg bg-mint/40 p-4">
-                <p className="text-sm font-semibold">Razorpay returned payment details.</p>
+            {confirmationMutation.isPending && (
+              <div className="mt-5 flex gap-3 rounded-lg bg-cloud/30 p-4">
+                <RefreshCw className="mt-0.5 size-4 shrink-0 animate-spin" aria-hidden="true" />
+
+                <div>
+                  <p className="text-sm font-semibold">Verifying your payment...</p>
+
+                  <p className="mt-1 text-xs leading-5 text-slate">
+                    Please keep this page open while we verify the payment securely with the
+                    backend.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {confirmationResult &&
+              confirmedPaymentStatus === "paid" &&
+              orderFinalized &&
+              confirmationResult.order && (
+                <div className="mt-5 rounded-lg bg-mint/40 p-4">
+                  <p className="text-sm font-semibold">Payment verified successfully.</p>
+
+                  <p className="mt-1 text-xs leading-5 text-slate">
+                    Razorpay confirmed the captured payment and the backend finalized your order.
+                  </p>
+
+                  <div className="mt-3 text-xs text-slate">
+                    Order status:{" "}
+                    <span className="font-semibold text-ink">
+                      {confirmationResult.order.status}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+            {confirmationResult && confirmedPaymentStatus === "authorized" && !orderFinalized && (
+              <div className="mt-5 rounded-lg bg-cloud/30 p-4">
+                <p className="text-sm font-semibold">Payment authorized.</p>
 
                 <p className="mt-1 text-xs leading-5 text-slate">
-                  We are not marking this order as paid from the browser callback. Backend
-                  verification will be connected in Part 36.
+                  Razorpay has authorized the payment, but the backend has not finalized the order
+                  yet.
+                </p>
+              </div>
+            )}
+
+            {confirmationResult && confirmedPaymentStatus === "pending" && !orderFinalized && (
+              <div className="mt-5 rounded-lg bg-cloud/30 p-4">
+                <p className="text-sm font-semibold">Payment is still processing.</p>
+
+                <p className="mt-1 text-xs leading-5 text-slate">
+                  Current provider state:{" "}
+                  <span className="font-semibold">{providerStatus ?? "pending"}</span>.
+                </p>
+              </div>
+            )}
+
+            {requiresManualReview && (
+              <div className="mt-5 rounded-lg bg-coral/10 p-4">
+                <p className="text-sm font-semibold text-coral">Payment requires review.</p>
+
+                <p className="mt-1 text-xs leading-5 text-coral">
+                  Payment may have been captured after the order reservation was no longer safely
+                  available. Do not make another payment for this order.
+                </p>
+              </div>
+            )}
+
+            {confirmationMutation.isError && (
+              <div className="mt-5 rounded-lg bg-coral/10 p-4">
+                <p className="text-sm font-semibold text-coral">
+                  We couldn't verify the payment yet.
+                </p>
+
+                <p className="mt-1 text-xs leading-5 text-coral">
+                  Do not pay again immediately. The payment may still be reconciled through the
+                  backend and Razorpay webhook processing.
                 </p>
               </div>
             )}
@@ -242,10 +378,20 @@ function OnlinePaymentCheckout({ result }) {
               type="button"
               size="lg"
               className="mt-8 w-full"
-              disabled={isBusy}
+              disabled={
+                isBusy ||
+                orderFinalized ||
+                requiresManualReview ||
+                confirmedPaymentStatus === "authorized"
+              }
               onClick={handlePay}
             >
-              {isBusy ? (
+              {confirmationMutation.isPending ? (
+                <>
+                  <RefreshCw className="size-4 animate-spin" aria-hidden="true" />
+                  Verifying payment...
+                </>
+              ) : isOpeningCheckout || paymentMutation.isPending ? (
                 <>
                   <RefreshCw className="size-4 animate-spin" aria-hidden="true" />
                   Preparing secure payment...
