@@ -31,6 +31,8 @@ import { createCheckoutIdempotencyKey } from "@/features/checkout/utils/checkout
 import { useClearCart } from "@/features/cart/hooks/use-cart-mutations";
 import { CodOrderConfirmation } from "@/features/checkout/components/cod-order-confirmation";
 
+import { OnlinePaymentCheckout } from "@/features/payments/components/online-payment-checkout";
+
 const CART_CONFLICT_ERROR_CODES = new Set([
   "ORDER_PRODUCT_UNAVAILABLE",
   "ORDER_VARIANT_UNAVAILABLE",
@@ -234,6 +236,10 @@ function CheckoutPage() {
         onRetryCartClear={handleRetryCodCartClear}
       />
     );
+  }
+
+  if (orderResult?.order?.payment?.method === "online") {
+    return <OnlinePaymentCheckout result={orderResult} />;
   }
 
   if (orderResult) {
