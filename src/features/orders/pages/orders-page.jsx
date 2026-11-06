@@ -440,10 +440,11 @@ function OrdersPage() {
                     </div>
                   </div>
 
-                  <p className="mt-5 text-xs leading-5 text-slate">
-                    Full order details, tracking, cancellation and timeline will be available in
-                    Part 40.
-                  </p>
+                  <div className="mt-5 flex justify-end border-t border-cloud pt-5">
+                    <Button asChild variant="outline">
+                      <Link to={`/account/orders/${order.id}`}>View order</Link>
+                    </Button>
+                  </div>
                 </article>
               );
             })}

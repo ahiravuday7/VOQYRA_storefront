@@ -48,4 +48,22 @@ async function getCustomerOrders({ params = {}, signal } = {}) {
   };
 }
 
-export { createOrder, getCustomerOrders };
+async function getCustomerOrder({ orderId, signal }) {
+  if (!orderId) {
+    throw new Error("Order ID is required.");
+  }
+
+  const response = await apiClient.get(`/orders/${encodeURIComponent(orderId)}`, {
+    signal,
+  });
+
+  const order = response.data?.data?.order;
+
+  if (!order) {
+    throw new Error("Order response did not contain an order.");
+  }
+
+  return order;
+}
+
+export { createOrder, getCustomerOrder, getCustomerOrders };

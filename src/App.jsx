@@ -29,6 +29,7 @@ import { AccountPage } from "@/features/account/pages/account-page";
 import { AccountSectionPlaceholder } from "@/features/account/pages/account-section-placeholder";
 
 import { OrdersPage } from "@/features/orders/pages/orders-page";
+import { OrderDetailsPage } from "@/features/orders/pages/order-details-page";
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
             <Route index element={<AccountPage />} />
 
             <Route path="orders" element={<OrdersPage />} />
+            <Route path="orders/:orderId" element={<OrderDetailsPage />} />
 
             <Route
               path="returns"
