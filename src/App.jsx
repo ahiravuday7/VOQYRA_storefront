@@ -28,6 +28,8 @@ import { AccountLayout } from "@/features/account/layouts/account-layout";
 import { AccountPage } from "@/features/account/pages/account-page";
 import { AccountSectionPlaceholder } from "@/features/account/pages/account-section-placeholder";
 
+import { OrdersPage } from "@/features/orders/pages/orders-page";
+
 function App() {
   return (
     <Routes>
@@ -42,16 +44,7 @@ function App() {
           <Route path="/account" element={<AccountLayout />}>
             <Route index element={<AccountPage />} />
 
-            <Route
-              path="orders"
-              element={
-                <AccountSectionPlaceholder
-                  eyebrow="Orders"
-                  title="Your orders."
-                  description="Order history will be connected to the backend in Part 39."
-                />
-              }
-            />
+            <Route path="orders" element={<OrdersPage />} />
 
             <Route
               path="returns"

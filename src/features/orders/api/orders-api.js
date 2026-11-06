@@ -26,4 +26,26 @@ async function createOrder({ orderData, idempotencyKey }) {
   };
 }
 
-export { createOrder };
+async function getCustomerOrders({ params = {}, signal } = {}) {
+  const response = await apiClient.get("/orders", {
+    params,
+    signal,
+  });
+
+  const data = response.data?.data;
+
+  return {
+    orders: data?.orders ?? [],
+    pagination: data?.pagination ?? {
+      page: 1,
+      limit: 20,
+      totalItems: 0,
+      totalPages: 0,
+      hasPreviousPage: false,
+      hasNextPage: false,
+    },
+    filters: data?.filters ?? {},
+  };
+}
+
+export { createOrder, getCustomerOrders };
