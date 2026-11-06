@@ -1,9 +1,8 @@
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import { CustomerRoute } from "@/app/router/customer-route";
 import { GuestRoute } from "@/app/router/guest-route";
 import { StorefrontLayout } from "@/components/layout/storefront-layout";
-import { PageContainer } from "@/components/common/page-container";
 
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { RegisterPage } from "@/features/auth/pages/register-page";
@@ -24,46 +23,10 @@ import { ProductPage } from "@/features/products/pages/product-page";
 import { WishlistPage } from "@/features/wishlist/pages/wishlist-page";
 import { CartPage } from "@/features/cart/pages/cart-page";
 import { CheckoutPage } from "@/features/checkout/pages/checkout-page";
-import { Button } from "@/components/ui/button";
-import { useLogout } from "@/features/auth/hooks/use-logout";
 
-function AccountPlaceholder() {
-  const navigate = useNavigate();
-  const logoutMutation = useLogout();
-
-  const handleLogout = async () => {
-    try {
-      await logoutMutation.mutateAsync();
-
-      navigate("/", {
-        replace: true,
-      });
-    } catch {
-      // Logout error handling can be polished
-      // when we build the full Account area.
-    }
-  };
-
-  return (
-    <main className="min-h-screen py-12">
-      <PageContainer>
-        <h1 className="font-display text-4xl font-semibold">My Account</h1>
-
-        <p className="mt-3 text-slate">Customer account area is protected successfully.</p>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="mt-6"
-          disabled={logoutMutation.isPending}
-          onClick={handleLogout}
-        >
-          {logoutMutation.isPending ? "Signing out..." : "Sign out"}
-        </Button>
-      </PageContainer>
-    </main>
-  );
-}
+import { AccountLayout } from "@/features/account/layouts/account-layout";
+import { AccountPage } from "@/features/account/pages/account-page";
+import { AccountSectionPlaceholder } from "@/features/account/pages/account-section-placeholder";
 
 function App() {
   return (
@@ -76,7 +39,42 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
 
           <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/account" element={<AccountPlaceholder />} />
+          <Route path="/account" element={<AccountLayout />}>
+            <Route index element={<AccountPage />} />
+
+            <Route
+              path="orders"
+              element={
+                <AccountSectionPlaceholder
+                  eyebrow="Orders"
+                  title="Your orders."
+                  description="Order history will be connected to the backend in Part 39."
+                />
+              }
+            />
+
+            <Route
+              path="returns"
+              element={
+                <AccountSectionPlaceholder
+                  eyebrow="Returns"
+                  title="Your returns."
+                  description="Return history will be connected in the upcoming customer account parts."
+                />
+              }
+            />
+
+            <Route
+              path="replacements"
+              element={
+                <AccountSectionPlaceholder
+                  eyebrow="Replacements"
+                  title="Your replacements."
+                  description="Replacement history will be connected in the upcoming customer account parts."
+                />
+              }
+            />
+          </Route>
         </Route>
 
         <Route path="/shop" element={<ShopPage />} />
