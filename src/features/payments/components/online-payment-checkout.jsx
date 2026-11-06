@@ -12,6 +12,9 @@ import { useInitiateOnlinePayment } from "@/features/payments/hooks/use-initiate
 import { loadRazorpayCheckout } from "@/features/payments/utils/load-razorpay-checkout";
 
 import { useConfirmRazorpayPayment } from "@/features/payments/hooks/use-confirm-razorpay-payment";
+import { useClearCart } from "@/features/cart/hooks/use-cart-mutations";
+
+import { OnlinePaymentResult } from "@/features/payments/components/online-payment-result";
 
 function OnlinePaymentCheckout({ result }) {
   const order = result.order;
@@ -20,9 +23,21 @@ function OnlinePaymentCheckout({ result }) {
 
   const confirmationMutation = useConfirmRazorpayPayment();
 
+  const clearCartMutation = useClearCart();
+
   const [isOpeningCheckout, setIsOpeningCheckout] = useState(false);
 
   const [providerFailure, setProviderFailure] = useState(null);
+
+  const clearCompletedOnlineCart = async () => {
+    try {
+      await clearCartMutation.mutateAsync();
+
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   const handleRazorpayResponse = async ({ paymentTransactionId, razorpayResponse }) => {
     try {
@@ -43,7 +58,15 @@ function OnlinePaymentCheckout({ result }) {
       const finalized = confirmation.orderFinalization?.finalized === true;
 
       if (paymentStatus === "paid" && finalized && confirmation.order) {
-        toast.success("Payment verified successfully.");
+        const cartCleared = await clearCompletedOnlineCart();
+
+        if (!cartCleared) {
+          toast.warning("Your payment and order are confirmed, but we couldn't clear your bag.");
+
+          return;
+        }
+
+        toast.success("Payment verified and order confirmed.");
 
         return;
       }
@@ -172,6 +195,18 @@ function OnlinePaymentCheckout({ result }) {
     }
   };
 
+  const handleRetryCartClear = async () => {
+    const cleared = await clearCompletedOnlineCart();
+
+    if (cleared) {
+      toast.success("Your bag has been cleared.");
+
+      return;
+    }
+
+    toast.error("Your order is safe, but we still couldn't clear your bag.");
+  };
+
   const isBusy = isOpeningCheckout || paymentMutation.isPending || confirmationMutation.isPending;
 
   const confirmationResult = confirmationMutation.data;
@@ -186,6 +221,48 @@ function OnlinePaymentCheckout({ result }) {
 
   const requiresManualReview =
     confirmationResult?.providerState?.action === "late-capture-manual-review";
+
+  const paymentResultState = (() => {
+    if (requiresManualReview) {
+      return "manual-review";
+    }
+
+    if (confirmedPaymentStatus === "paid" && orderFinalized && confirmationResult?.order) {
+      return "success";
+    }
+
+    if (confirmedPaymentStatus === "authorized" || confirmedPaymentStatus === "pending") {
+      return "processing";
+    }
+
+    if (confirmationMutation.isError) {
+      return "verification-error";
+    }
+
+    if (providerFailure) {
+      return "failed";
+    }
+
+    return null;
+  })();
+
+  if (paymentResultState) {
+    return (
+      <OnlinePaymentResult
+        state={paymentResultState}
+        order={displayOrder}
+        payment={confirmationResult?.payment ?? paymentMutation.data?.payment ?? null}
+        providerStatus={providerStatus}
+        providerFailure={providerFailure}
+        verificationError={confirmationMutation.error}
+        isCartClearing={clearCartMutation.isPending}
+        cartClearError={clearCartMutation.error}
+        isRetryingPayment={isOpeningCheckout || paymentMutation.isPending}
+        onRetryPayment={handlePay}
+        onRetryCartClear={handleRetryCartClear}
+      />
+    );
+  }
 
   return (
     <main className="min-h-screen py-8 sm:py-12">
@@ -283,115 +360,14 @@ function OnlinePaymentCheckout({ result }) {
               </div>
             )}
 
-            {providerFailure && (
-              <div className="mt-5 rounded-lg bg-coral/10 p-4">
-                <p className="text-sm font-semibold text-coral">Payment was not completed.</p>
-
-                <p className="mt-1 text-xs leading-5 text-coral">
-                  {providerFailure.description ?? "You can safely try again."}
-                </p>
-              </div>
-            )}
-
-            {confirmationMutation.isPending && (
-              <div className="mt-5 flex gap-3 rounded-lg bg-cloud/30 p-4">
-                <RefreshCw className="mt-0.5 size-4 shrink-0 animate-spin" aria-hidden="true" />
-
-                <div>
-                  <p className="text-sm font-semibold">Verifying your payment...</p>
-
-                  <p className="mt-1 text-xs leading-5 text-slate">
-                    Please keep this page open while we verify the payment securely with the
-                    backend.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {confirmationResult &&
-              confirmedPaymentStatus === "paid" &&
-              orderFinalized &&
-              confirmationResult.order && (
-                <div className="mt-5 rounded-lg bg-mint/40 p-4">
-                  <p className="text-sm font-semibold">Payment verified successfully.</p>
-
-                  <p className="mt-1 text-xs leading-5 text-slate">
-                    Razorpay confirmed the captured payment and the backend finalized your order.
-                  </p>
-
-                  <div className="mt-3 text-xs text-slate">
-                    Order status:{" "}
-                    <span className="font-semibold text-ink">
-                      {confirmationResult.order.status}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-            {confirmationResult && confirmedPaymentStatus === "authorized" && !orderFinalized && (
-              <div className="mt-5 rounded-lg bg-cloud/30 p-4">
-                <p className="text-sm font-semibold">Payment authorized.</p>
-
-                <p className="mt-1 text-xs leading-5 text-slate">
-                  Razorpay has authorized the payment, but the backend has not finalized the order
-                  yet.
-                </p>
-              </div>
-            )}
-
-            {confirmationResult && confirmedPaymentStatus === "pending" && !orderFinalized && (
-              <div className="mt-5 rounded-lg bg-cloud/30 p-4">
-                <p className="text-sm font-semibold">Payment is still processing.</p>
-
-                <p className="mt-1 text-xs leading-5 text-slate">
-                  Current provider state:{" "}
-                  <span className="font-semibold">{providerStatus ?? "pending"}</span>.
-                </p>
-              </div>
-            )}
-
-            {requiresManualReview && (
-              <div className="mt-5 rounded-lg bg-coral/10 p-4">
-                <p className="text-sm font-semibold text-coral">Payment requires review.</p>
-
-                <p className="mt-1 text-xs leading-5 text-coral">
-                  Payment may have been captured after the order reservation was no longer safely
-                  available. Do not make another payment for this order.
-                </p>
-              </div>
-            )}
-
-            {confirmationMutation.isError && (
-              <div className="mt-5 rounded-lg bg-coral/10 p-4">
-                <p className="text-sm font-semibold text-coral">
-                  We couldn't verify the payment yet.
-                </p>
-
-                <p className="mt-1 text-xs leading-5 text-coral">
-                  Do not pay again immediately. The payment may still be reconciled through the
-                  backend and Razorpay webhook processing.
-                </p>
-              </div>
-            )}
-
             <Button
               type="button"
               size="lg"
               className="mt-8 w-full"
-              disabled={
-                isBusy ||
-                orderFinalized ||
-                requiresManualReview ||
-                confirmedPaymentStatus === "authorized"
-              }
+              disabled={isBusy}
               onClick={handlePay}
             >
-              {confirmationMutation.isPending ? (
-                <>
-                  <RefreshCw className="size-4 animate-spin" aria-hidden="true" />
-                  Verifying payment...
-                </>
-              ) : isOpeningCheckout || paymentMutation.isPending ? (
+              {isOpeningCheckout || paymentMutation.isPending ? (
                 <>
                   <RefreshCw className="size-4 animate-spin" aria-hidden="true" />
                   Preparing secure payment...
