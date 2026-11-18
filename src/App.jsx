@@ -31,6 +31,9 @@ import { AccountSectionPlaceholder } from "@/features/account/pages/account-sect
 import { OrdersPage } from "@/features/orders/pages/orders-page";
 import { OrderDetailsPage } from "@/features/orders/pages/order-details-page";
 
+import { ReturnsPage } from "@/features/orders/pages/returns-page";
+import { ReturnDetailsPage } from "@/features/orders/pages/return-details-page";
+
 function App() {
   return (
     <Routes>
@@ -48,16 +51,9 @@ function App() {
             <Route path="orders" element={<OrdersPage />} />
             <Route path="orders/:orderId" element={<OrderDetailsPage />} />
 
-            <Route
-              path="returns"
-              element={
-                <AccountSectionPlaceholder
-                  eyebrow="Returns"
-                  title="Your returns."
-                  description="Return history will be connected in the upcoming customer account parts."
-                />
-              }
-            />
+            <Route path="returns" element={<ReturnsPage />} />
+
+            <Route path="returns/:returnRequestId" element={<ReturnDetailsPage />} />
 
             <Route
               path="replacements"

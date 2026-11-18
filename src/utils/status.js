@@ -5,7 +5,7 @@ const warningStatuses = new Set(["pending", "processing", "requested", "in_trans
 const dangerStatuses = new Set(["failed", "cancelled", "canceled", "rejected", "inactive"]);
 
 function getStatusTone(status = "") {
-  const normalizedStatus = String(status).trim().toLowerCase();
+  const normalizedStatus = String(status).trim().toLowerCase().replaceAll("-", "_");
 
   if (successStatuses.has(normalizedStatus)) {
     return "success";
@@ -25,6 +25,7 @@ function getStatusTone(status = "") {
 function formatStatus(status = "") {
   return String(status)
     .replaceAll("_", " ")
+    .replaceAll("-", " ")
     .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 

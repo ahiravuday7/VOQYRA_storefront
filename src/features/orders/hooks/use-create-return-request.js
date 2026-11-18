@@ -21,7 +21,7 @@ function useCreateReturnRequest() {
        * synchronized.
        */
       await queryClient.invalidateQueries({
-        queryKey: queryKeys.orders.returns(),
+        queryKey: queryKeys.orders.returnLists(),
       });
     },
   });
