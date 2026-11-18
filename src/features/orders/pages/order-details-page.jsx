@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 
 import { useOrder } from "@/features/orders/hooks/use-order";
+import { OrderCancellation } from "@/features/orders/components/order-cancellation";
 
 function formatDateTime(value) {
   if (!value) {
@@ -176,6 +177,8 @@ function OrderDetailsPage() {
             </p>
           </div>
         )}
+
+        <OrderCancellation order={order} />
       </div>
 
       {/* Items */}

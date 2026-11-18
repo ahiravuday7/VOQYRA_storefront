@@ -66,4 +66,22 @@ async function getCustomerOrder({ orderId, signal }) {
   return order;
 }
 
-export { createOrder, getCustomerOrder, getCustomerOrders };
+async function cancelCustomerOrder({ orderId, reason }) {
+  if (!orderId) {
+    throw new Error("Order ID is required.");
+  }
+
+  const response = await apiClient.post(`/orders/${encodeURIComponent(orderId)}/cancel`, {
+    reason,
+  });
+
+  const order = response.data?.data?.order;
+
+  if (!order) {
+    throw new Error("Order cancellation response did not contain an order.");
+  }
+
+  return order;
+}
+
+export { cancelCustomerOrder, createOrder, getCustomerOrder, getCustomerOrders };
