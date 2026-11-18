@@ -26,13 +26,15 @@ import { CheckoutPage } from "@/features/checkout/pages/checkout-page";
 
 import { AccountLayout } from "@/features/account/layouts/account-layout";
 import { AccountPage } from "@/features/account/pages/account-page";
-import { AccountSectionPlaceholder } from "@/features/account/pages/account-section-placeholder";
 
 import { OrdersPage } from "@/features/orders/pages/orders-page";
 import { OrderDetailsPage } from "@/features/orders/pages/order-details-page";
 
 import { ReturnsPage } from "@/features/orders/pages/returns-page";
 import { ReturnDetailsPage } from "@/features/orders/pages/return-details-page";
+
+import { ReplacementsPage } from "@/features/orders/pages/replacements-page";
+import { ReplacementDetailsPage } from "@/features/orders/pages/replacement-details-page";
 
 function App() {
   return (
@@ -55,16 +57,9 @@ function App() {
 
             <Route path="returns/:returnRequestId" element={<ReturnDetailsPage />} />
 
-            <Route
-              path="replacements"
-              element={
-                <AccountSectionPlaceholder
-                  eyebrow="Replacements"
-                  title="Your replacements."
-                  description="Replacement history will be connected in the upcoming customer account parts."
-                />
-              }
-            />
+            <Route path="replacements" element={<ReplacementsPage />} />
+
+            <Route path="replacements/:replacementId" element={<ReplacementDetailsPage />} />
           </Route>
         </Route>
 

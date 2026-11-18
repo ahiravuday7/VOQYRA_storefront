@@ -1,6 +1,13 @@
 const successStatuses = new Set(["active", "paid", "delivered", "completed", "approved"]);
 
-const warningStatuses = new Set(["pending", "processing", "requested", "in_transit"]);
+const warningStatuses = new Set([
+  "pending",
+  "processing",
+  "requested",
+  "in_transit",
+  "reserved",
+  "shipped",
+]);
 
 const dangerStatuses = new Set(["failed", "cancelled", "canceled", "rejected", "inactive"]);
 

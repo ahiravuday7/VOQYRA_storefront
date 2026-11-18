@@ -62,6 +62,11 @@ const queryKeys = {
 
     returnDetail: (returnRequestId) => ["orders", "returns", "detail", returnRequestId],
     replacements: () => ["orders", "replacements"],
+
+    replacementLists: () => ["orders", "replacements", "list"],
+
+    replacementList: (params = {}) => ["orders", "replacements", "list", params],
+
     replacementDetail: (replacementId) => ["orders", "replacements", "detail", replacementId],
   },
 };
