@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import { useOrder } from "@/features/orders/hooks/use-order";
 import { OrderCancellation } from "@/features/orders/components/order-cancellation";
+import { OrderReturnRequest } from "@/features/orders/components/order-return-request";
 
 function formatDateTime(value) {
   if (!value) {
@@ -179,6 +180,7 @@ function OrderDetailsPage() {
         )}
 
         <OrderCancellation order={order} />
+        <OrderReturnRequest order={order} />
       </div>
 
       {/* Items */}
